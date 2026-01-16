@@ -255,7 +255,6 @@ const db = firebase.firestore();
 
 const salary = 25000;
 const start = new Date(2025,7,1);
-
 let current = new Date(start);
 let data = {};
 let activeMode = 'pick';
@@ -319,6 +318,7 @@ function renderSummary(){
 
     let unpaidDays = sums.pick.length;
     let unpaid = unpaidDays * salary;
+    let totalSelected = 0;
 
     hariDipilihEl.textContent = Object.keys(data).length;
     belumBayarEl.textContent = unpaid.toLocaleString('id-ID');
@@ -336,6 +336,7 @@ function renderSummary(){
             </div>`;
         }
     }
+    totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
 }
 
 async function loadInitialData(){
