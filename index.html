@@ -204,7 +204,6 @@ h2{ text-align:center; margin:4px 0 10px; }
 
 <div class="main">
 
-<!-- KIRI -->
 <div class="left-panel">
     <div class="info">
         <strong>Hari dipilih</strong>
@@ -221,144 +220,45 @@ h2{ text-align:center; margin:4px 0 10px; }
     </div>
 </div>
 
-<!-- TENGAH -->
 <div>
     <div class="month">
         <div class="calendar" id="calendar"></div>
     </div>
-<div class="filebar">
-    <button onclick="document.getElementById('file').click()">📂 Load</button>
-    <button onclick="saveFile()">💾 Simpan</button>
-    <button onclick="updateData()">🔄 Update</button>
-    <input type="file" id="file" accept=".csv" hidden>
+    <div class="filebar">
+        <button onclick="updateData()">🔄 Update</button>
+    </div>
 </div>
 
-</div>
-
-<!-- KANAN -->
 <div class="right-panel" id="gajiPanel"></div>
 
 </div>
 </div>
 </div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
+// ================= FIREBASE =================
+const firebaseConfig = {
+  apiKey: "AIzaSyC_49oOXNWlXtxgkWba8BDTivlOOoZc9CI",
+  authDomain: "cobacoba-a3e50.firebaseapp.com",
+  projectId: "cobacoba-a3e50",
+  storageBucket: "cobacoba-a3e50.firebasestorage.app",
+  messagingSenderId: "251609072919",
+  appId: "1:251609072919:web:90b7102e76bd2a28592352"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+// ===========================================
+
 const salary = 25000;
 const start = new Date(2025,7,1);
-
 let current = new Date(start);
 let data = {};
 let activeMode = 'pick';
 let selectedPays = [];
-
-/* === DATA OTOMATIS === */
-const initialData = `
-tanggal,status
-2025-7-25,pay1
-2025-7-26,pay1
-2025-7-27,pay1
-2025-7-29,pay1
-2025-8-1,pay1
-2025-8-2,pay1
-2025-8-3,pay1
-2025-8-8,pay1
-2025-8-9,pay1
-2025-8-10,pay1
-2025-8-12,pay1
-2025-8-15,pay2
-2025-8-16,pay2
-2025-8-17,pay2
-2025-8-19,pay2
-2025-8-22,pay2
-2025-8-23,pay2
-2025-8-24,pay3
-2025-8-26,pay3
-2025-8-29,pay3
-2025-8-30,pay3
-2025-9-1,pay3
-2025-9-3,pay3
-2025-9-6,pay3
-2025-9-7,pay3
-2025-9-8,pay3
-2025-9-10,pay3
-2025-9-13,pay3
-2025-9-14,pay4
-2025-9-15,pay4
-2025-9-17,pay4
-2025-9-20,pay4
-2025-9-21,pay4
-2025-9-22,pay4
-2025-9-24,pay4
-2025-9-27,pay4
-2025-9-28,pay4
-2025-9-29,pay4
-2025-9-31,pay4
-2025-10-3,pay4
-2025-10-4,pay4
-2025-10-5,pay4
-2025-10-7,pay4
-2025-10-10,pay4
-2025-10-11,pay4
-2025-10-12,pay4
-2025-10-14,pick
-2025-10-17,pick
-2025-10-18,pick
-2025-10-19,pick
-2025-10-21,pick
-2025-10-24,pick
-2025-10-25,pick
-2025-10-26,pick
-2025-10-28,pick
-2025-11-1,pick
-2025-11-2,pick
-2025-11-3,pick
-2025-11-8,pick
-2025-11-9,pick
-2025-11-10,pick
-2025-11-11,pick
-2025-11-12,pick
-2025-11-15,pick
-2025-11-16,pick
-2025-11-17,pick
-2025-11-18,pick
-2025-11-19,pick
-2025-11-22,pick
-2025-11-23,pick
-2025-11-24,pick
-2025-11-26,pick
-2025-11-29,pick
-2025-11-30,pick
-2025-11-31,pick
-2026-0-2,pick
-2026-0-5,pick
-2026-0-6,pick
-2026-0-7,pick
-2026-0-8,pick
-2026-0-9,pick
-2026-0-12,pick
-2026-0-13,pick
-2026-0-14,pick
-2026-0-15,pick
-`;
-
-function loadInitialData(){
-    const saved = localStorage.getItem('monitoringGajiData');
-
-    if(saved){
-        data = JSON.parse(saved);
-        const pays = localStorage.getItem('monitoringGajiPays');
-        selectedPays = pays ? JSON.parse(pays) : [];
-        return;
-    }
-
-    // fallback ke data awal
-    initialData.trim().split('\n').slice(1).forEach(row=>{
-        const [tanggal,status] = row.split(',');
-        if(tanggal && status){
-            data[tanggal.trim()] = status.trim();
-        }
-    });
-}
 
 const calendar = document.getElementById('calendar');
 const gajiPanel = document.getElementById('gajiPanel');
@@ -372,15 +272,6 @@ const belumBayarEl = document.getElementById('belumBayar');
 const dayNames = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 const modes = ['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
 
-function parseKey(key){
-    const [y,m,d] = key.split('-').map(Number);
-    return new Date(`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
-}
-function formatDate(key){
-    return parseKey(key).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-}
-
-/* MODE */
 function renderControls(){
     controls.innerHTML = modes.map(m=>`
         <button class="${m} ${activeMode===m?'active':''}"
@@ -390,11 +281,9 @@ function renderControls(){
     `).join('');
 }
 
-/* NAV */
 function prevMonth(){ current.setMonth(current.getMonth()-1); render(); }
 function nextMonth(){ current.setMonth(current.getMonth()+1); render(); }
 
-/* RENDER */
 function render(){
     calendar.innerHTML='';
     title.textContent = current.toLocaleString('id-ID',{month:'long',year:'numeric'});
@@ -422,7 +311,6 @@ function render(){
     renderSummary();
 }
 
-/* SUMMARY */
 function renderSummary(){
     let sums={};
     modes.forEach(m=>sums[m]=[]);
@@ -441,77 +329,40 @@ function renderSummary(){
         const k='pay'+i;
         if(sums[k].length){
             const amount=sums[k].length*salary;
-            if(selectedPays.includes(k)) totalSelected+=amount;
             gajiPanel.innerHTML+=`
             <div class="gaji-box">
-                <strong>
-                    Gaji ${i}
-                    <button class="plus ${selectedPays.includes(k)?'active':''}"
-                        onclick="togglePay('${k}')">+</button>
-                </strong>
+                <strong>Gaji ${i}</strong>
                 Rp ${amount.toLocaleString('id-ID')}
-                <small>Tanggal dibayar: ${formatDate(
-                    sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1)
-                )}</small>
             </div>`;
         }
     }
     totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
 }
 
-function togglePay(k){
-    selectedPays = selectedPays.includes(k)
-        ? selectedPays.filter(x=>x!==k)
-        : [...selectedPays,k];
-    renderSummary();
+async function loadInitialData(){
+    const doc = await db.collection("gaji").doc("global").get();
+    if(doc.exists){
+        const res = doc.data();
+        data = res.data || {};
+        selectedPays = res.selectedPays || [];
+    }
 }
 
-/* LOAD */
-document.getElementById('file').addEventListener('change',e=>{
-    const file=e.target.files[0];
-    if(!file) return;
-    const reader=new FileReader();
-    reader.onload=()=>{
-        data={};
-        reader.result.split('\n').slice(1).forEach(r=>{
-            const [k,v]=r.split(',');
-            if(k&&v) data[k]=v.trim();
-        });
-        render();
-    };
-    reader.readAsText(file);
-});
-
-/* SIMPAN */
-function saveFile(){
-    let lastKey=null;
-    Object.keys(data).forEach(k=>{
-        if(!lastKey || parseKey(k)>parseKey(lastKey)) lastKey=k;
+async function updateData(){
+    await db.collection("gaji").doc("global").set({
+        data,
+        selectedPays,
+        updatedAt: new Date()
     });
-    let fileName='Update Gaji';
-    if(lastKey) fileName+=' '+formatDate(lastKey);
-
-    let rows=[['tanggal','status']];
-    Object.entries(data).forEach(([k,v])=>rows.push([k,v]));
-    const csv=rows.map(r=>r.join(',')).join('\n');
-
-    const blob=new Blob([csv],{type:'text/csv'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=fileName+'.csv';
-    a.click();
-}
-
-    function updateData(){
-    localStorage.setItem('monitoringGajiData', JSON.stringify(data));
-    localStorage.setItem('monitoringGajiPays', JSON.stringify(selectedPays));
-    alert('✅ Data berhasil di-update & disimpan');
+    alert("✅ Data berhasil di-update (ONLINE)");
 }
 
 /* INIT */
-renderControls();
-loadInitialData();
-render();
+(async ()=>{
+    renderControls();
+    await loadInitialData();
+    render();
+})();
 </script>
 </body>
 </html>
