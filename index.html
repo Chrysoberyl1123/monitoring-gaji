@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitoring Gaji</title>
 
-
 <style>
 :root{
     --bg:#0f1220;
@@ -21,49 +20,25 @@ body{
     background:var(--bg);
     color:var(--text);
 }
-.wrapper{
-    display:flex;
-    justify-content:center;
-    padding:16px;
-}
-.container{ width:1000px; }
+.wrapper{display:flex;justify-content:center;padding:16px;}
+.container{width:1000px;}
 
-h2{ text-align:center; margin:4px 0 10px; }
+h2{text-align:center;margin:4px 0 10px;}
 
-.nav{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:8px;
-}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .nav button{
-    background:#3949ab;
-    border:none;
-    border-radius:8px;
-    color:#fff;
-    padding:6px 14px;
-    cursor:pointer;
+    background:#3949ab;border:none;border-radius:8px;color:#fff;
+    padding:6px 14px;cursor:pointer;
 }
-.month-title{ font-weight:bold; }
+.month-title{font-weight:bold;}
 
-.controls{
-    text-align:center;
-    margin-bottom:10px;
-}
+.controls{text-align:center;margin-bottom:10px;}
 .controls button{
-    font-size:10px;
-    padding:6px 8px;
-    margin:2px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    color:#fff;
-    opacity:.6;
+    font-size:10px;padding:6px 8px;margin:2px;
+    border:none;border-radius:6px;cursor:pointer;
+    color:#fff;opacity:.6;
 }
-.controls button.active{
-    opacity:1;
-    outline:2px solid #fff;
-}
+.controls button.active{opacity:1;outline:2px solid #fff;}
 
 .pick{background:#2196f3;}
 .pay1{background:#4caf50;}
@@ -77,18 +52,10 @@ h2{ text-align:center; margin:4px 0 10px; }
 .pay9{background:#ffb300;}
 .pay10{background:#26c6da;}
 
-.main{
-    display:grid;
-    grid-template-columns:220px 1fr 300px;
-    gap:14px;
-}
+.main{display:grid;grid-template-columns:220px 1fr 300px;gap:14px;}
 
 .left-panel{display:grid;gap:12px;}
-.info{
-    background:var(--card2);
-    border-radius:14px;
-    padding:12px;
-}
+.info{background:var(--card2);border-radius:14px;padding:12px;}
 .info.total{background:#1b5e20;color:#b9f6ca;}
 .info.unpaid{background:#3b1d2a;color:#ffb4c6;}
 
@@ -96,11 +63,15 @@ h2{ text-align:center; margin:4px 0 10px; }
     background:var(--card);
     border-radius:20px;
     padding:20px;
+    position:relative;
+    z-index:5;
 }
 .calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
     gap:10px;
+    position:relative;
+    z-index:5;
 }
 .day-name{text-align:center;font-size:13px;opacity:.6;}
 .date{
@@ -111,16 +82,15 @@ h2{ text-align:center; margin:4px 0 10px; }
     cursor:pointer;
     font-size:18px;
     font-weight:bold;
+    position:relative;
+    z-index:5;
 }
 
 .filebar{margin-top:10px;}
 .filebar button{
-    background:#455a64;
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    padding:6px 12px;
-    cursor:pointer;
+    background:#455a64;color:#fff;
+    border:none;border-radius:8px;
+    padding:6px 12px;cursor:pointer;
 }
 
 .right-panel{
@@ -129,6 +99,7 @@ h2{ text-align:center; margin:4px 0 10px; }
     padding:10px;
     max-height:520px;
     overflow-y:auto;
+    pointer-events:auto;
 }
 .gaji-box{
     background:var(--card);
@@ -136,35 +107,21 @@ h2{ text-align:center; margin:4px 0 10px; }
     padding:10px;
     margin-bottom:10px;
 }
-.gaji-box strong{
-    display:flex;
-    justify-content:space-between;
-}
+.gaji-box strong{display:flex;justify-content:space-between;}
 .gaji-box small{color:var(--muted);}
 
 .plus{
-    background:#2e7d32;
-    border:none;
-    border-radius:6px;
-    color:#fff;
-    width:24px;
-    height:24px;
-    cursor:pointer;
+    background:#2e7d32;border:none;border-radius:6px;
+    color:#fff;width:24px;height:24px;cursor:pointer;
 }
 .plus.active{background:#c62828;}
 
-    @media (max-width: 768px){
-  .main{
-    grid-template-columns: 1fr;
-  }
-  .right-panel{
-    order: 3;
-  }
-  .month{
-    aspect-ratio: auto;
-  }
-}
+.date, button{touch-action:manipulation;}
 
+@media(max-width:768px){
+    .main{grid-template-columns:1fr;}
+    .right-panel{order:3;}
+}
 </style>
 </head>
 
@@ -175,7 +132,7 @@ h2{ text-align:center; margin:4px 0 10px; }
 
 <div class="nav">
 <button onclick="prevMonth()">←</button>
-<div id="monthTitle"></div>
+<div class="month-title" id="monthTitle"></div>
 <button onclick="nextMonth()">→</button>
 </div>
 
@@ -201,6 +158,7 @@ h2{ text-align:center; margin:4px 0 10px; }
 
 </div></div></div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -237,6 +195,9 @@ ${m==='pick'?'Hari':'Gaji '+m.replace('pay','')}
 </button>`).join('');
 }
 
+function prevMonth(){current.setMonth(current.getMonth()-1);render();}
+function nextMonth(){current.setMonth(current.getMonth()+1);render();}
+
 function render(){
 calendar.innerHTML='';
 document.getElementById('monthTitle').textContent=
@@ -255,7 +216,11 @@ const div=document.createElement('div');
 div.className='date';
 div.textContent=d;
 if(data[key])div.classList.add(data[key]);
-div.onclick=()=>{data[key]=data[key]===activeMode?null:activeMode;render();}
+div.onclick=()=>{
+  if(data[key]===activeMode) delete data[key];
+  else data[key]=activeMode;
+  render();
+};
 calendar.appendChild(div);
 }
 renderSummary();
@@ -279,11 +244,16 @@ gajiPanel.innerHTML+=`
 <button class="plus ${selectedPays.includes(k)?'active':''}"
 onclick="togglePay('${k}')">+</button></strong>
 Rp ${amt.toLocaleString('id-ID')}
-<small>Tanggal dibayar: ${formatDate(sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1))}</small>
+<small>Tanggal dibayar: ${formatDate(
+sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1)
+)}</small>
 </div>`;
 }
 }
 document.getElementById('totalGaji').textContent=totalSelected.toLocaleString('id-ID');
+document.getElementById('hariDipilih').textContent=Object.keys(data).length;
+document.getElementById('hariBelumBayar').textContent=sums.pick.length;
+document.getElementById('belumBayar').textContent=(sums.pick.length*salary).toLocaleString('id-ID');
 }
 
 function togglePay(k){
@@ -301,11 +271,10 @@ selectedPays=doc.data().selectedPays||[];
 
 async function updateData(){
 await db.collection("gaji").doc("global").set({data,selectedPays});
-alert("✅ Data di-update");
+alert("✅ Data berhasil di-update (ONLINE)");
 }
 
 (async()=>{renderControls();await loadInitialData();render();})();
 </script>
 </body>
 </html>
-
