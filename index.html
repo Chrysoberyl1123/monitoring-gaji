@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitoring Gaji</title>
 
 <style>
@@ -19,54 +20,26 @@ body{
     background:var(--bg);
     color:var(--text);
 }
-.wrapper{
-    display:flex;
-    justify-content:center;
-    padding:16px;
-}
-.container{ width:1000px; }
+.wrapper{display:flex;justify-content:center;padding:16px;}
+.container{width:1000px;}
 
-h2{ text-align:center; margin:4px 0 10px; }
+h2{text-align:center;margin:4px 0 10px;}
 
-/* NAV */
-.nav{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:8px;
-}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .nav button{
-    background:#3949ab;
-    border:none;
-    border-radius:8px;
-    color:#fff;
-    padding:6px 14px;
-    font-size:14px;
-    cursor:pointer;
+    background:#3949ab;border:none;border-radius:8px;color:#fff;
+    padding:6px 14px;cursor:pointer;
 }
-.month-title{ font-weight:bold; font-size:16px; }
+.month-title{font-weight:bold;}
 
-/* MODE */
-.controls{
-    text-align:center;
-    margin-bottom:10px;
-}
+.controls{text-align:center;margin-bottom:10px;}
 .controls button{
-    font-size:10px;
-    padding:6px 8px;
-    margin:2px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    color:#fff;
-    opacity:.6;
+    font-size:10px;padding:6px 8px;margin:2px;
+    border:none;border-radius:6px;cursor:pointer;
+    color:#fff;opacity:.6;
 }
-.controls button.active{
-    opacity:1;
-    outline:2px solid #fff;
-}
+.controls button.active{opacity:1;outline:2px solid #fff;}
 
-/* WARNA */
 .pick{background:#2196f3;}
 .pay1{background:#4caf50;}
 .pay2{background:#9c27b0;}
@@ -79,45 +52,28 @@ h2{ text-align:center; margin:4px 0 10px; }
 .pay9{background:#ffb300;}
 .pay10{background:#26c6da;}
 
-/* GRID */
-.main{
-    display:grid;
-    grid-template-columns:220px 1fr 300px;
-    gap:14px;
-}
+.main{display:grid;grid-template-columns:220px 1fr 300px;gap:14px;}
 
-/* KIRI */
-.left-panel{
-    display:grid;
-    gap:12px;
-}
-.info{
-    background:var(--card2);
-    border-radius:14px;
-    padding:12px;
-}
-.info strong{display:block;font-size:15px;margin-bottom:4px;}
+.left-panel{display:grid;gap:12px;}
+.info{background:var(--card2);border-radius:14px;padding:12px;}
 .info.total{background:#1b5e20;color:#b9f6ca;}
 .info.unpaid{background:#3b1d2a;color:#ffb4c6;}
 
-/* KALENDER */
 .month{
     background:var(--card);
     border-radius:20px;
     padding:20px;
-    aspect-ratio:1/1;
-    box-shadow:0 10px 25px rgba(0,0,0,.5);
+    position:relative;
+    z-index:5;
 }
 .calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
     gap:10px;
+    position:relative;
+    z-index:5;
 }
-.day-name{
-    text-align:center;
-    font-size:13px;
-    opacity:.6;
-}
+.day-name{text-align:center;font-size:13px;opacity:.6;}
 .date{
     background:#3a3f70;
     border-radius:14px;
@@ -126,41 +82,24 @@ h2{ text-align:center; margin:4px 0 10px; }
     cursor:pointer;
     font-size:18px;
     font-weight:bold;
+    position:relative;
+    z-index:5;
 }
-.date.pick{background:#2196f3;}
-.date.pay1{background:#4caf50;}
-.date.pay2{background:#9c27b0;}
-.date.pay3{background:#ff9800;}
-.date.pay4{background:#f44336;}
-.date.pay5{background:#26a69a;}
-.date.pay6{background:#3f51b5;}
-.date.pay7{background:#ec407a;}
-.date.pay8{background:#c0ca33;}
-.date.pay9{background:#ffb300;}
-.date.pay10{background:#26c6da;}
 
-/* FILE BAR */
-.filebar{
-    display:flex;
-    gap:10px;
-    margin-top:10px;
-}
+.filebar{margin-top:10px;}
 .filebar button{
-    background:#455a64;
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    padding:6px 12px;
-    cursor:pointer;
+    background:#455a64;color:#fff;
+    border:none;border-radius:8px;
+    padding:6px 12px;cursor:pointer;
 }
 
-/* KANAN */
 .right-panel{
     background:var(--card2);
     border-radius:16px;
     padding:10px;
     max-height:520px;
     overflow-y:auto;
+    pointer-events:auto;
 }
 .gaji-box{
     background:var(--card);
@@ -168,36 +107,33 @@ h2{ text-align:center; margin:4px 0 10px; }
     padding:10px;
     margin-bottom:10px;
 }
-.gaji-box strong{
-    display:flex;
-    justify-content:space-between;
-}
+.gaji-box strong{display:flex;justify-content:space-between;}
 .gaji-box small{color:var(--muted);}
 
-/* PLUS */
 .plus{
-    background:#2e7d32;
-    border:none;
-    border-radius:6px;
-    color:#fff;
-    width:24px;
-    height:24px;
-    cursor:pointer;
+    background:#2e7d32;border:none;border-radius:6px;
+    color:#fff;width:24px;height:24px;cursor:pointer;
 }
 .plus.active{background:#c62828;}
+
+.date, button{touch-action:manipulation;}
+
+@media(max-width:768px){
+    .main{grid-template-columns:1fr;}
+    .right-panel{order:3;}
+}
 </style>
 </head>
 
 <body>
-<div class="wrapper">
-<div class="container">
+<div class="wrapper"><div class="container">
 
 <h2>Monitoring Gaji (Rp25.000 / Hari)</h2>
 
 <div class="nav">
-    <button onclick="prevMonth()">←</button>
-    <div class="month-title" id="monthTitle"></div>
-    <button onclick="nextMonth()">→</button>
+<button onclick="prevMonth()">←</button>
+<div class="month-title" id="monthTitle"></div>
+<button onclick="nextMonth()">→</button>
 </div>
 
 <div class="controls" id="controls"></div>
@@ -205,116 +141,98 @@ h2{ text-align:center; margin:4px 0 10px; }
 <div class="main">
 
 <div class="left-panel">
-    <div class="info">
-        <strong>Hari dipilih</strong>
-        <span id="hariDipilih">0</span> hari
-    </div>
-    <div class="info total">
-        <strong>Total Gaji</strong>
-        Rp <span id="totalGaji">0</span>
-    </div>
-    <div class="info unpaid">
-        <strong>Belum dibayar</strong>
-        Rp <span id="belumBayar">0</span><br>
-        (<span id="hariBelumBayar">0</span> hari)
-    </div>
+<div class="info">Hari dipilih: <span id="hariDipilih">0</span></div>
+<div class="info total">Total Gaji: Rp <span id="totalGaji">0</span></div>
+<div class="info unpaid">Belum dibayar: Rp <span id="belumBayar">0</span>
+(<span id="hariBelumBayar">0</span> hari)</div>
 </div>
 
 <div>
-    <div class="month">
-        <div class="calendar" id="calendar"></div>
-    </div>
-    <div class="filebar">
-        <button onclick="updateData()">🔄 Update</button>
-    </div>
+<div class="month"><div class="calendar" id="calendar"></div></div>
+<div class="filebar">
+<button onclick="updateData()">🔄 Update</button>
+</div>
 </div>
 
 <div class="right-panel" id="gajiPanel"></div>
 
-</div>
-</div>
-</div>
+</div></div></div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ================= FIREBASE =================
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyC_49oOXNWlXtxgkWba8BDTivlOOoZc9CI",
-  authDomain: "cobacoba-a3e50.firebaseapp.com",
-  projectId: "cobacoba-a3e50",
-  storageBucket: "cobacoba-a3e50.firebasestorage.app",
-  messagingSenderId: "251609072919",
-  appId: "1:251609072919:web:90b7102e76bd2a28592352"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-// ===========================================
+  projectId: "cobacoba-a3e50"
+});
+const db=firebase.firestore();
 
-const salary = 25000;
-const start = new Date(2025,7,1);
-let current = new Date(start);
-let data = {};
-let activeMode = 'pick';
-let selectedPays = [];
+const salary=25000;
+let current=new Date();
+let data={};
+let selectedPays=[];
+let activeMode='pick';
 
-const calendar = document.getElementById('calendar');
-const gajiPanel = document.getElementById('gajiPanel');
-const controls = document.getElementById('controls');
-const title = document.getElementById('monthTitle');
+const modes=['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
+const calendar=document.getElementById('calendar');
+const gajiPanel=document.getElementById('gajiPanel');
 
-const hariDipilihEl = document.getElementById('hariDipilih');
-const totalGajiEl = document.getElementById('totalGaji');
-const belumBayarEl = document.getElementById('belumBayar');
-
-const dayNames = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-const modes = ['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
-
-function renderControls(){
-    controls.innerHTML = modes.map(m=>`
-        <button class="${m} ${activeMode===m?'active':''}"
-            onclick="activeMode='${m}';renderControls()">
-            ${m==='pick'?'Hari dipilih':'Gaji '+m.replace('pay','')}
-        </button>
-    `).join('');
+function parseKey(k){
+  const [y,m,d]=k.split('-').map(Number);
+  return new Date(y,m,d);
+}
+function formatDate(k){
+  return parseKey(k).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
 }
 
-function prevMonth(){ current.setMonth(current.getMonth()-1); render(); }
-function nextMonth(){ current.setMonth(current.getMonth()+1); render(); }
+function renderControls(){
+document.getElementById('controls').innerHTML=modes.map(m=>`
+<button class="${m} ${activeMode===m?'active':''}"
+onclick="activeMode='${m}';renderControls()">
+${m==='pick'?'Hari':'Gaji '+m.replace('pay','')}
+</button>`).join('');
+}
+
+function prevMonth(){current.setMonth(current.getMonth()-1);render();}
+function nextMonth(){current.setMonth(current.getMonth()+1);render();}
 
 function render(){
-    calendar.innerHTML='';
-    title.textContent = current.toLocaleString('id-ID',{month:'long',year:'numeric'});
-    dayNames.forEach(d=>calendar.innerHTML+=`<div class="day-name">${d}</div>`);
+calendar.innerHTML='';
+document.getElementById('monthTitle').textContent=
+current.toLocaleString('id-ID',{month:'long',year:'numeric'});
+['Min','Sen','Sel','Rab','Kam','Jum','Sab']
+.forEach(d=>calendar.innerHTML+=`<div class="day-name">${d}</div>`);
 
-    const y=current.getFullYear(), m=current.getMonth();
-    const first=new Date(y,m,1).getDay();
-    const total=new Date(y,m+1,0).getDate();
+const y=current.getFullYear(),m=current.getMonth();
+const first=new Date(y,m,1).getDay();
+const total=new Date(y,m+1,0).getDate();
+for(let i=0;i<first;i++)calendar.appendChild(document.createElement('div'));
 
-    for(let i=0;i<first;i++) calendar.appendChild(document.createElement('div'));
-
-    for(let d=1;d<=total;d++){
-        const key=`${y}-${m}-${d}`;
-        const div=document.createElement('div');
-        div.className='date';
-        div.textContent=d;
-        if(data[key]) div.classList.add(data[key]);
-        div.onclick=()=>{
-            if(data[key]===activeMode) delete data[key];
-            else data[key]=activeMode;
-            render();
-        };
-        calendar.appendChild(div);
-    }
-    renderSummary();
+for(let d=1;d<=total;d++){
+const key=`${y}-${m}-${d}`;
+const div=document.createElement('div');
+div.className='date';
+div.textContent=d;
+if(data[key])div.classList.add(data[key]);
+div.onclick=()=>{
+  if(data[key]===activeMode) delete data[key];
+  else data[key]=activeMode;
+  render();
+};
+calendar.appendChild(div);
+}
+renderSummary();
 }
 
 function renderSummary(){
-    let sums={};
-    modes.forEach(m=>sums[m]=[]);
-    Object.entries(data).forEach(([k,v])=>{ if(sums[v]) sums[v].push(k); });
+    let sums = {};
+    modes.forEach(m => sums[m] = []);
+
+    Object.entries(data).forEach(([k,v])=>{
+        if(v && sums[v]) sums[v].push(k);
+    });
 
     let unpaidDays = sums.pick.length;
     let unpaid = unpaidDays * salary;
@@ -324,45 +242,56 @@ function renderSummary(){
     belumBayarEl.textContent = unpaid.toLocaleString('id-ID');
     document.getElementById('hariBelumBayar').textContent = unpaidDays;
 
-    gajiPanel.innerHTML='';
+    gajiPanel.innerHTML = '';
+
     for(let i=1;i<=10;i++){
-        const k='pay'+i;
+        const k = 'pay'+i;
         if(sums[k].length){
-            const amount=sums[k].length*salary;
-            gajiPanel.innerHTML+=`
+            const amount = sums[k].length * salary;
+
+            if(selectedPays.includes(k)) totalSelected += amount;
+
+            // ambil tanggal terakhir TANPA .at()
+            const sorted = sums[k].sort((a,b)=>parseKey(a)-parseKey(b));
+            const lastDate = sorted[sorted.length - 1];
+
+            gajiPanel.innerHTML += `
             <div class="gaji-box">
-                <strong>Gaji ${i}</strong>
+                <strong>
+                    Gaji ${i}
+                    <button class="plus ${selectedPays.includes(k)?'active':''}"
+                        onclick="togglePay('${k}')">+</button>
+                </strong>
                 Rp ${amount.toLocaleString('id-ID')}
+                <small>
+                    Tanggal dibayar: ${formatDate(lastDate)}
+                </small>
             </div>`;
         }
     }
+
     totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
 }
 
+function togglePay(k){
+selectedPays=selectedPays.includes(k)?selectedPays.filter(x=>x!==k):[...selectedPays,k];
+renderSummary();
+}
+
 async function loadInitialData(){
-    const doc = await db.collection("gaji").doc("global").get();
-    if(doc.exists){
-        const res = doc.data();
-        data = res.data || {};
-        selectedPays = res.selectedPays || [];
-    }
+const doc=await db.collection("gaji").doc("global").get();
+if(doc.exists){
+data=doc.data().data||{};
+selectedPays=doc.data().selectedPays||[];
+}
 }
 
 async function updateData(){
-    await db.collection("gaji").doc("global").set({
-        data,
-        selectedPays,
-        updatedAt: new Date()
-    });
-    alert("✅ Data berhasil di-update (ONLINE)");
+await db.collection("gaji").doc("global").set({data,selectedPays});
+alert("✅ Data berhasil di-update (ONLINE)");
 }
 
-/* INIT */
-(async ()=>{
-    renderControls();
-    await loadInitialData();
-    render();
-})();
+(async()=>{renderControls();await loadInitialData();render();})();
 </script>
 </body>
 </html>
