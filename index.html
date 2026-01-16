@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Monitoring Gaji</title>
+
+<style>
+:root{
+    --bg:#0f1220;
+    --card:#1a1f38;
+    --card2:#22285a;
+    --text:#e8ebff;
+    --muted:#aab0ff;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+.wrapper{
+    display:flex;
+    justify-content:center;
+    padding:16px;
+}
+.container{ width:1000px; }
+
+h2{ text-align:center; margin:4px 0 10px; }
+
+/* NAV */
+.nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+}
+.nav button{
+    background:#3949ab;
+    border:none;
+    border-radius:8px;
+    color:#fff;
+    padding:6px 14px;
+    font-size:14px;
+    cursor:pointer;
+}
+.month-title{ font-weight:bold; font-size:16px; }
+
+/* MODE */
+.controls{
+    text-align:center;
+    margin-bottom:10px;
+}
+.controls button{
+    font-size:10px;
+    padding:6px 8px;
+    margin:2px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    color:#fff;
+    opacity:.6;
+}
+.controls button.active{
+    opacity:1;
+    outline:2px solid #fff;
+}
+
+/* WARNA */
+.pick{background:#2196f3;}
+.pay1{background:#4caf50;}
+.pay2{background:#9c27b0;}
+.pay3{background:#ff9800;}
+.pay4{background:#f44336;}
+.pay5{background:#26a69a;}
+.pay6{background:#3f51b5;}
+.pay7{background:#ec407a;}
+.pay8{background:#c0ca33;}
+.pay9{background:#ffb300;}
+.pay10{background:#26c6da;}
+
+/* GRID */
+.main{
+    display:grid;
+    grid-template-columns:220px 1fr 300px;
+    gap:14px;
+}
+
+/* KIRI */
+.left-panel{
+    display:grid;
+    gap:12px;
+}
+.info{
+    background:var(--card2);
+    border-radius:14px;
+    padding:12px;
+}
+.info strong{display:block;font-size:15px;margin-bottom:4px;}
+.info.total{background:#1b5e20;color:#b9f6ca;}
+.info.unpaid{background:#3b1d2a;color:#ffb4c6;}
+
+/* KALENDER */
+.month{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    aspect-ratio:1/1;
+    box-shadow:0 10px 25px rgba(0,0,0,.5);
+}
+.calendar{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
+}
+.day-name{
+    text-align:center;
+    font-size:13px;
+    opacity:.6;
+}
+.date{
+    background:#3a3f70;
+    border-radius:14px;
+    text-align:center;
+    padding:16px 0;
+    cursor:pointer;
+    font-size:18px;
+    font-weight:bold;
+}
+.date.pick{background:#2196f3;}
+.date.pay1{background:#4caf50;}
+.date.pay2{background:#9c27b0;}
+.date.pay3{background:#ff9800;}
+.date.pay4{background:#f44336;}
+.date.pay5{background:#26a69a;}
+.date.pay6{background:#3f51b5;}
+.date.pay7{background:#ec407a;}
+.date.pay8{background:#c0ca33;}
+.date.pay9{background:#ffb300;}
+.date.pay10{background:#26c6da;}
+
+/* FILE BAR */
+.filebar{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+.filebar button{
+    background:#455a64;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:6px 12px;
+    cursor:pointer;
+}
+
+/* KANAN */
+.right-panel{
+    background:var(--card2);
+    border-radius:16px;
+    padding:10px;
+    max-height:520px;
+    overflow-y:auto;
+}
+.gaji-box{
+    background:var(--card);
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+}
+.gaji-box strong{
+    display:flex;
+    justify-content:space-between;
+}
+.gaji-box small{color:var(--muted);}
+
+/* PLUS */
+.plus{
+    background:#2e7d32;
+    border:none;
+    border-radius:6px;
+    color:#fff;
+    width:24px;
+    height:24px;
+    cursor:pointer;
+}
+.plus.active{background:#c62828;}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+<div class="container">
+
+<h2>Monitoring Gaji (Rp25.000 / Hari)</h2>
+
+<div class="nav">
+    <button onclick="prevMonth()">←</button>
+    <div class="month-title" id="monthTitle"></div>
+    <button onclick="nextMonth()">→</button>
+</div>
+
+<div class="controls" id="controls"></div>
+
+<div class="main">
+
+<!-- KIRI -->
+<div class="left-panel">
+    <div class="info">
+        <strong>Hari dipilih</strong>
+        <span id="hariDipilih">0</span> hari
+    </div>
+    <div class="info total">
+        <strong>Total Gaji</strong>
+        Rp <span id="totalGaji">0</span>
+    </div>
+    <div class="info unpaid">
+        <strong>Belum dibayar</strong>
+        Rp <span id="belumBayar">0</span><br>
+        (<span id="hariBelumBayar">0</span> hari)
+    </div>
+</div>
+
+<!-- TENGAH -->
+<div>
+    <div class="month">
+        <div class="calendar" id="calendar"></div>
+    </div>
+<div class="filebar">
+    <button onclick="document.getElementById('file').click()">📂 Load</button>
+    <button onclick="saveFile()">💾 Simpan</button>
+    <button onclick="updateData()">🔄 Update</button>
+    <input type="file" id="file" accept=".csv" hidden>
+</div>
+
+</div>
+
+<!-- KANAN -->
+<div class="right-panel" id="gajiPanel"></div>
+
+</div>
+</div>
+</div>
+
+<script>
+const salary = 25000;
+const start = new Date(2025,7,1);
+
+let current = new Date(start);
+let data = {};
+let activeMode = 'pick';
+let selectedPays = [];
+
+/* === DATA OTOMATIS === */
+const initialData = `
+tanggal,status
+2025-7-25,pay1
+2025-7-26,pay1
+2025-7-27,pay1
+2025-7-29,pay1
+2025-8-1,pay1
+2025-8-2,pay1
+2025-8-3,pay1
+2025-8-8,pay1
+2025-8-9,pay1
+2025-8-10,pay1
+2025-8-12,pay1
+2025-8-15,pay2
+2025-8-16,pay2
+2025-8-17,pay2
+2025-8-19,pay2
+2025-8-22,pay2
+2025-8-23,pay2
+2025-8-24,pay3
+2025-8-26,pay3
+2025-8-29,pay3
+2025-8-30,pay3
+2025-9-1,pay3
+2025-9-3,pay3
+2025-9-6,pay3
+2025-9-7,pay3
+2025-9-8,pay3
+2025-9-10,pay3
+2025-9-13,pay3
+2025-9-14,pay4
+2025-9-15,pay4
+2025-9-17,pay4
+2025-9-20,pay4
+2025-9-21,pay4
+2025-9-22,pay4
+2025-9-24,pay4
+2025-9-27,pay4
+2025-9-28,pay4
+2025-9-29,pay4
+2025-9-31,pay4
+2025-10-3,pay4
+2025-10-4,pay4
+2025-10-5,pay4
+2025-10-7,pay4
+2025-10-10,pay4
+2025-10-11,pay4
+2025-10-12,pay4
+2025-10-14,pick
+2025-10-17,pick
+2025-10-18,pick
+2025-10-19,pick
+2025-10-21,pick
+2025-10-24,pick
+2025-10-25,pick
+2025-10-26,pick
+2025-10-28,pick
+2025-11-1,pick
+2025-11-2,pick
+2025-11-3,pick
+2025-11-8,pick
+2025-11-9,pick
+2025-11-10,pick
+2025-11-11,pick
+2025-11-12,pick
+2025-11-15,pick
+2025-11-16,pick
+2025-11-17,pick
+2025-11-18,pick
+2025-11-19,pick
+2025-11-22,pick
+2025-11-23,pick
+2025-11-24,pick
+2025-11-26,pick
+2025-11-29,pick
+2025-11-30,pick
+2025-11-31,pick
+2026-0-2,pick
+2026-0-5,pick
+2026-0-6,pick
+2026-0-7,pick
+2026-0-8,pick
+2026-0-9,pick
+2026-0-12,pick
+2026-0-13,pick
+2026-0-14,pick
+2026-0-15,pick
+`;
+
+function loadInitialData(){
+    const saved = localStorage.getItem('monitoringGajiData');
+
+    if(saved){
+        data = JSON.parse(saved);
+        const pays = localStorage.getItem('monitoringGajiPays');
+        selectedPays = pays ? JSON.parse(pays) : [];
+        return;
+    }
+
+    // fallback ke data awal
+    initialData.trim().split('\n').slice(1).forEach(row=>{
+        const [tanggal,status] = row.split(',');
+        if(tanggal && status){
+            data[tanggal.trim()] = status.trim();
+        }
+    });
+}
+
+const calendar = document.getElementById('calendar');
+const gajiPanel = document.getElementById('gajiPanel');
+const controls = document.getElementById('controls');
+const title = document.getElementById('monthTitle');
+
+const hariDipilihEl = document.getElementById('hariDipilih');
+const totalGajiEl = document.getElementById('totalGaji');
+const belumBayarEl = document.getElementById('belumBayar');
+
+const dayNames = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const modes = ['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
+
+function parseKey(key){
+    const [y,m,d] = key.split('-').map(Number);
+    return new Date(`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+}
+function formatDate(key){
+    return parseKey(key).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+}
+
+/* MODE */
+function renderControls(){
+    controls.innerHTML = modes.map(m=>`
+        <button class="${m} ${activeMode===m?'active':''}"
+            onclick="activeMode='${m}';renderControls()">
+            ${m==='pick'?'Hari dipilih':'Gaji '+m.replace('pay','')}
+        </button>
+    `).join('');
+}
+
+/* NAV */
+function prevMonth(){ current.setMonth(current.getMonth()-1); render(); }
+function nextMonth(){ current.setMonth(current.getMonth()+1); render(); }
+
+/* RENDER */
+function render(){
+    calendar.innerHTML='';
+    title.textContent = current.toLocaleString('id-ID',{month:'long',year:'numeric'});
+    dayNames.forEach(d=>calendar.innerHTML+=`<div class="day-name">${d}</div>`);
+
+    const y=current.getFullYear(), m=current.getMonth();
+    const first=new Date(y,m,1).getDay();
+    const total=new Date(y,m+1,0).getDate();
+
+    for(let i=0;i<first;i++) calendar.appendChild(document.createElement('div'));
+
+    for(let d=1;d<=total;d++){
+        const key=`${y}-${m}-${d}`;
+        const div=document.createElement('div');
+        div.className='date';
+        div.textContent=d;
+        if(data[key]) div.classList.add(data[key]);
+        div.onclick=()=>{
+            if(data[key]===activeMode) delete data[key];
+            else data[key]=activeMode;
+            render();
+        };
+        calendar.appendChild(div);
+    }
+    renderSummary();
+}
+
+/* SUMMARY */
+function renderSummary(){
+    let sums={};
+    modes.forEach(m=>sums[m]=[]);
+    Object.entries(data).forEach(([k,v])=>{ if(sums[v]) sums[v].push(k); });
+
+    let unpaidDays = sums.pick.length;
+    let unpaid = unpaidDays * salary;
+    let totalSelected = 0;
+
+    hariDipilihEl.textContent = Object.keys(data).length;
+    belumBayarEl.textContent = unpaid.toLocaleString('id-ID');
+    document.getElementById('hariBelumBayar').textContent = unpaidDays;
+
+    gajiPanel.innerHTML='';
+    for(let i=1;i<=10;i++){
+        const k='pay'+i;
+        if(sums[k].length){
+            const amount=sums[k].length*salary;
+            if(selectedPays.includes(k)) totalSelected+=amount;
+            gajiPanel.innerHTML+=`
+            <div class="gaji-box">
+                <strong>
+                    Gaji ${i}
+                    <button class="plus ${selectedPays.includes(k)?'active':''}"
+                        onclick="togglePay('${k}')">+</button>
+                </strong>
+                Rp ${amount.toLocaleString('id-ID')}
+                <small>Tanggal dibayar: ${formatDate(
+                    sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1)
+                )}</small>
+            </div>`;
+        }
+    }
+    totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
+}
+
+function togglePay(k){
+    selectedPays = selectedPays.includes(k)
+        ? selectedPays.filter(x=>x!==k)
+        : [...selectedPays,k];
+    renderSummary();
+}
+
+/* LOAD */
+document.getElementById('file').addEventListener('change',e=>{
+    const file=e.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+        data={};
+        reader.result.split('\n').slice(1).forEach(r=>{
+            const [k,v]=r.split(',');
+            if(k&&v) data[k]=v.trim();
+        });
+        render();
+    };
+    reader.readAsText(file);
+});
+
+/* SIMPAN */
+function saveFile(){
+    let lastKey=null;
+    Object.keys(data).forEach(k=>{
+        if(!lastKey || parseKey(k)>parseKey(lastKey)) lastKey=k;
+    });
+    let fileName='Update Gaji';
+    if(lastKey) fileName+=' '+formatDate(lastKey);
+
+    let rows=[['tanggal','status']];
+    Object.entries(data).forEach(([k,v])=>rows.push([k,v]));
+    const csv=rows.map(r=>r.join(',')).join('\n');
+
+    const blob=new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=fileName+'.csv';
+    a.click();
+}
+
+    function updateData(){
+    localStorage.setItem('monitoringGajiData', JSON.stringify(data));
+    localStorage.setItem('monitoringGajiPays', JSON.stringify(selectedPays));
+    alert('✅ Data berhasil di-update & disimpan');
+}
+
+/* INIT */
+renderControls();
+loadInitialData();
+render();
+</script>
+</body>
+</html>
