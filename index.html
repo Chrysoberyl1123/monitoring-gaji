@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitoring Gaji</title>
+
 
 <style>
 :root{
@@ -150,6 +152,19 @@ h2{ text-align:center; margin:4px 0 10px; }
     cursor:pointer;
 }
 .plus.active{background:#c62828;}
+
+    @media (max-width: 768px){
+  .main{
+    grid-template-columns: 1fr;
+  }
+  .right-panel{
+    order: 3;
+  }
+  .month{
+    aspect-ratio: auto;
+  }
+}
+
 </style>
 </head>
 
@@ -293,3 +308,4 @@ alert("✅ Data di-update");
 </script>
 </body>
 </html>
+
