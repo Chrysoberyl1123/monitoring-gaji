@@ -240,25 +240,20 @@ h2{ text-align:center; margin:4px 0 10px; }
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ================= FIREBASE =================
 const firebaseConfig = {
   apiKey: "AIzaSyC_49oOXNWlXtxgkWba8BDTivlOOoZc9CI",
   authDomain: "cobacoba-a3e50.firebaseapp.com",
   projectId: "cobacoba-a3e50",
-  storageBucket: "cobacoba-a3e50.firebasestorage.app",
-  messagingSenderId: "251609072919",
-  appId: "1:251609072919:web:90b7102e76bd2a28592352"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-// ===========================================
 
 const salary = 25000;
 const start = new Date(2025,7,1);
 let current = new Date(start);
 let data = {};
-let activeMode = 'pick';
 let selectedPays = [];
+let activeMode = 'pick';
 
 const calendar = document.getElementById('calendar');
 const gajiPanel = document.getElementById('gajiPanel');
@@ -271,6 +266,14 @@ const belumBayarEl = document.getElementById('belumBayar');
 
 const dayNames = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 const modes = ['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
+
+function parseKey(key){
+    const [y,m,d] = key.split('-').map(Number);
+    return new Date(y, m, d);
+}
+function formatDate(key){
+    return parseKey(key).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+}
 
 function renderControls(){
     controls.innerHTML = modes.map(m=>`
@@ -302,8 +305,7 @@ function render(){
         div.textContent=d;
         if(data[key]) div.classList.add(data[key]);
         div.onclick=()=>{
-            if(data[key]===activeMode) delete data[key];
-            else data[key]=activeMode;
+            data[key]===activeMode ? delete data[key] : data[key]=activeMode;
             render();
         };
         calendar.appendChild(div);
@@ -312,52 +314,59 @@ function render(){
 }
 
 function renderSummary(){
-    let sums={};
-    modes.forEach(m=>sums[m]=[]);
-    Object.entries(data).forEach(([k,v])=>{ if(sums[v]) sums[v].push(k); });
+    let sums={}; modes.forEach(m=>sums[m]=[]);
+    Object.entries(data).forEach(([k,v])=>sums[v]?.push(k));
 
-    let unpaidDays = sums.pick.length;
-    let unpaid = unpaidDays * salary;
-    let totalSelected = 0;
+    let unpaidDays=sums.pick.length;
+    belumBayarEl.textContent=(unpaidDays*salary).toLocaleString('id-ID');
+    document.getElementById('hariBelumBayar').textContent=unpaidDays;
+    hariDipilihEl.textContent=Object.keys(data).length;
 
-    hariDipilihEl.textContent = Object.keys(data).length;
-    belumBayarEl.textContent = unpaid.toLocaleString('id-ID');
-    document.getElementById('hariBelumBayar').textContent = unpaidDays;
-
+    let totalSelected=0;
     gajiPanel.innerHTML='';
+
     for(let i=1;i<=10;i++){
         const k='pay'+i;
         if(sums[k].length){
             const amount=sums[k].length*salary;
+            if(selectedPays.includes(k)) totalSelected+=amount;
             gajiPanel.innerHTML+=`
             <div class="gaji-box">
-                <strong>Gaji ${i}</strong>
+                <strong>
+                    Gaji ${i}
+                    <button class="plus ${selectedPays.includes(k)?'active':''}"
+                        onclick="togglePay('${k}')">+</button>
+                </strong>
                 Rp ${amount.toLocaleString('id-ID')}
+                <small>Tanggal dibayar: ${formatDate(sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1))}</small>
             </div>`;
         }
     }
-    totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
+    totalGajiEl.textContent=totalSelected.toLocaleString('id-ID');
+}
+
+function togglePay(k){
+    selectedPays = selectedPays.includes(k)
+        ? selectedPays.filter(x=>x!==k)
+        : [...selectedPays,k];
+    renderSummary();
 }
 
 async function loadInitialData(){
-    const doc = await db.collection("gaji").doc("global").get();
+    const doc=await db.collection("gaji").doc("global").get();
     if(doc.exists){
-        const res = doc.data();
-        data = res.data || {};
-        selectedPays = res.selectedPays || [];
+        data=doc.data().data||{};
+        selectedPays=doc.data().selectedPays||[];
     }
 }
 
 async function updateData(){
     await db.collection("gaji").doc("global").set({
-        data,
-        selectedPays,
-        updatedAt: new Date()
+        data, selectedPays, updatedAt:new Date()
     });
     alert("✅ Data berhasil di-update (ONLINE)");
 }
 
-/* INIT */
 (async ()=>{
     renderControls();
     await loadInitialData();
