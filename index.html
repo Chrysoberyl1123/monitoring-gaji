@@ -227,33 +227,53 @@ renderSummary();
 }
 
 function renderSummary(){
-let sums={};modes.forEach(m=>sums[m]=[]);
-Object.entries(data).forEach(([k,v])=>sums[v]?.push(k));
+    let sums = {};
+    modes.forEach(m => sums[m] = []);
 
-gajiPanel.innerHTML='';
-let totalSelected=0;
+    Object.entries(data).forEach(([k, v]) => {
+        if (v && sums[v]) {
+            sums[v].push(k);
+        }
+    });
 
-for(let i=1;i<=10;i++){
-const k='pay'+i;
-if(sums[k].length){
-const amt=sums[k].length*salary;
-if(selectedPays.includes(k))totalSelected+=amt;
-gajiPanel.innerHTML+=`
-<div class="gaji-box">
-<strong>Gaji ${i}
-<button class="plus ${selectedPays.includes(k)?'active':''}"
-onclick="togglePay('${k}')">+</button></strong>
-Rp ${amt.toLocaleString('id-ID')}
-<small>Tanggal dibayar: ${formatDate(
-sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1)
-)}</small>
-</div>`;
-}
-}
-document.getElementById('totalGaji').textContent=totalSelected.toLocaleString('id-ID');
-document.getElementById('hariDipilih').textContent=Object.keys(data).length;
-document.getElementById('hariBelumBayar').textContent=sums.pick.length;
-document.getElementById('belumBayar').textContent=(sums.pick.length*salary).toLocaleString('id-ID');
+    gajiPanel.innerHTML = '';
+    let totalSelected = 0;
+
+    for (let i = 1; i <= 10; i++) {
+        const k = 'pay' + i;
+        if (sums[k].length) {
+            const amt = sums[k].length * salary;
+            if (selectedPays.includes(k)) totalSelected += amt;
+
+            gajiPanel.innerHTML += `
+            <div class="gaji-box">
+                <strong>
+                    Gaji ${i}
+                    <button class="plus ${selectedPays.includes(k)?'active':''}"
+                        onclick="togglePay('${k}')">+</button>
+                </strong>
+                Rp ${amt.toLocaleString('id-ID')}
+                <small>
+                    Tanggal dibayar:
+                    ${formatDate(
+                        sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).at(-1)
+                    )}
+                </small>
+            </div>`;
+        }
+    }
+
+    document.getElementById('totalGaji').textContent =
+        totalSelected.toLocaleString('id-ID');
+
+    document.getElementById('hariDipilih').textContent =
+        Object.keys(data).length;
+
+    document.getElementById('hariBelumBayar').textContent =
+        sums.pick.length;
+
+    document.getElementById('belumBayar').textContent =
+        (sums.pick.length * salary).toLocaleString('id-ID');
 }
 
 function togglePay(k){
@@ -278,3 +298,4 @@ alert("✅ Data berhasil di-update (ONLINE)");
 </script>
 </body>
 </html>
+
