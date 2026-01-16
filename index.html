@@ -63,15 +63,11 @@ h2{text-align:center;margin:4px 0 10px;}
     background:var(--card);
     border-radius:20px;
     padding:20px;
-    position:relative;
-    z-index:5;
 }
 .calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
     gap:10px;
-    position:relative;
-    z-index:5;
 }
 .day-name{text-align:center;font-size:13px;opacity:.6;}
 .date{
@@ -82,8 +78,6 @@ h2{text-align:center;margin:4px 0 10px;}
     cursor:pointer;
     font-size:18px;
     font-weight:bold;
-    position:relative;
-    z-index:5;
 }
 
 .filebar{margin-top:10px;}
@@ -99,7 +93,6 @@ h2{text-align:center;margin:4px 0 10px;}
     padding:10px;
     max-height:520px;
     overflow-y:auto;
-    pointer-events:auto;
 }
 .gaji-box{
     background:var(--card);
@@ -115,8 +108,6 @@ h2{text-align:center;margin:4px 0 10px;}
     color:#fff;width:24px;height:24px;cursor:pointer;
 }
 .plus.active{background:#c62828;}
-
-.date, button{touch-action:manipulation;}
 
 @media(max-width:768px){
     .main{grid-template-columns:1fr;}
@@ -158,7 +149,6 @@ h2{text-align:center;margin:4px 0 10px;}
 
 </div></div></div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -167,20 +157,26 @@ firebase.initializeApp({
   apiKey: "AIzaSyC_49oOXNWlXtxgkWba8BDTivlOOoZc9CI",
   projectId: "cobacoba-a3e50"
 });
-const db=firebase.firestore();
+const db = firebase.firestore();
 
-const salary=25000;
-let current=new Date();
-let data={};
-let selectedPays=[];
-let activeMode='pick';
+const salary = 25000;
+let current = new Date();
+let data = {};
+let selectedPays = [];
+let activeMode = 'pick';
 
-const modes=['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
-const calendar=document.getElementById('calendar');
-const gajiPanel=document.getElementById('gajiPanel');
+const modes = ['pick','pay1','pay2','pay3','pay4','pay5','pay6','pay7','pay8','pay9','pay10'];
+
+const calendar = document.getElementById('calendar');
+const gajiPanel = document.getElementById('gajiPanel');
+const controls = document.getElementById('controls');
+
+const hariDipilihEl = document.getElementById('hariDipilih');
+const totalGajiEl = document.getElementById('totalGaji');
+const belumBayarEl = document.getElementById('belumBayar');
 
 function parseKey(k){
-  const [y,m,d]=k.split('-').map(Number);
+  const [y,m,d] = k.split('-').map(Number);
   return new Date(y,m,d);
 }
 function formatDate(k){
@@ -188,7 +184,7 @@ function formatDate(k){
 }
 
 function renderControls(){
-document.getElementById('controls').innerHTML=modes.map(m=>`
+controls.innerHTML = modes.map(m=>`
 <button class="${m} ${activeMode===m?'active':''}"
 onclick="activeMode='${m}';renderControls()">
 ${m==='pick'?'Hari':'Gaji '+m.replace('pay','')}
@@ -200,8 +196,9 @@ function nextMonth(){current.setMonth(current.getMonth()+1);render();}
 
 function render(){
 calendar.innerHTML='';
-document.getElementById('monthTitle').textContent=
+document.getElementById('monthTitle').textContent =
 current.toLocaleString('id-ID',{month:'long',year:'numeric'});
+
 ['Min','Sen','Sel','Rab','Kam','Jum','Sab']
 .forEach(d=>calendar.innerHTML+=`<div class="day-name">${d}</div>`);
 
@@ -227,50 +224,35 @@ renderSummary();
 }
 
 function renderSummary(){
-    let sums = {};
-    modes.forEach(m => sums[m] = []);
+let sums={};modes.forEach(m=>sums[m]=[]);
+Object.entries(data).forEach(([k,v])=>{if(v&&sums[v])sums[v].push(k);});
 
-    Object.entries(data).forEach(([k,v])=>{
-        if(v && sums[v]) sums[v].push(k);
-    });
+let unpaidDays=sums.pick.length;
+let unpaid=unpaidDays*salary;
+let totalSelected=0;
 
-    let unpaidDays = sums.pick.length;
-    let unpaid = unpaidDays * salary;
-    let totalSelected = 0;
+hariDipilihEl.textContent=Object.keys(data).length;
+belumBayarEl.textContent=unpaid.toLocaleString('id-ID');
+document.getElementById('hariBelumBayar').textContent=unpaidDays;
 
-    hariDipilihEl.textContent = Object.keys(data).length;
-    belumBayarEl.textContent = unpaid.toLocaleString('id-ID');
-    document.getElementById('hariBelumBayar').textContent = unpaidDays;
-
-    gajiPanel.innerHTML = '';
-
-    for(let i=1;i<=10;i++){
-        const k = 'pay'+i;
-        if(sums[k].length){
-            const amount = sums[k].length * salary;
-
-            if(selectedPays.includes(k)) totalSelected += amount;
-
-            // ambil tanggal terakhir TANPA .at()
-            const sorted = sums[k].sort((a,b)=>parseKey(a)-parseKey(b));
-            const lastDate = sorted[sorted.length - 1];
-
-            gajiPanel.innerHTML += `
-            <div class="gaji-box">
-                <strong>
-                    Gaji ${i}
-                    <button class="plus ${selectedPays.includes(k)?'active':''}"
-                        onclick="togglePay('${k}')">+</button>
-                </strong>
-                Rp ${amount.toLocaleString('id-ID')}
-                <small>
-                    Tanggal dibayar: ${formatDate(lastDate)}
-                </small>
-            </div>`;
-        }
-    }
-
-    totalGajiEl.textContent = totalSelected.toLocaleString('id-ID');
+gajiPanel.innerHTML='';
+for(let i=1;i<=10;i++){
+const k='pay'+i;
+if(sums[k].length){
+const amt=sums[k].length*salary;
+if(selectedPays.includes(k))totalSelected+=amt;
+const last=sums[k].sort((a,b)=>parseKey(a)-parseKey(b)).slice(-1)[0];
+gajiPanel.innerHTML+=`
+<div class="gaji-box">
+<strong>Gaji ${i}
+<button class="plus ${selectedPays.includes(k)?'active':''}"
+onclick="togglePay('${k}')">+</button></strong>
+Rp ${amt.toLocaleString('id-ID')}
+<small>Tanggal dibayar: ${formatDate(last)}</small>
+</div>`;
+}
+}
+totalGajiEl.textContent=totalSelected.toLocaleString('id-ID');
 }
 
 function togglePay(k){
